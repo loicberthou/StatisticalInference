@@ -6,9 +6,10 @@ date: "August 19, 2015"
 output: pdf_document
 ---
 
-```{r, echo=FALSE, results='hide'}
+```{r, echo=FALSE, results='hide', message=FALSE}
 set.seed(20150819)
 library(ggplot2)
+library(dplyr)
 ```
 
 # Overview
@@ -36,9 +37,10 @@ str(ToothGrowth)
 
 Finally, I will draw a first plot of the scattered points.
 
-```{r}
+```{r, fig.width=7, fig.height=4, echo=FALSE}
 g <- ggplot(data=ToothGrowth, aes(x=dose, y=len))
 g <- g + geom_point(aes(color=supp), size=5, alpha=.5)
+g <- g + ggtitle("Figure 1 - Exploratory data analysis")
 g
 ```
 
@@ -50,7 +52,57 @@ The vitamin C has been administered either in the form of orange juice (represen
 
 # Tooth growth comparison by supp and dose
 
-TODO
+We will compare the effects of the orange juice and ascorbic acid for each dose. In this experience, each measure has been taken on a different animal, so we can not infer a grouping by animal.
+
+We will then compare the mean length progression between two doses and look at the confidence interval to make any conclusion.
+
+## Orange Juice
+
+### From dose 0.5 to 1.0
+
+```{r, echo=FALSE}
+g2 <- select(filter(ToothGrowth, supp=="OJ", dose==1.0), len)
+g1 <- select(filter(ToothGrowth, supp=="OJ", dose==0.5), len)
+confGroth <- t.test(g2, g1, paired = FALSE)$conf.int
+```
+The range of values for the average growth with a confidence interval of 95% is between `r confGroth[1]` and `r confGroth[2]`.
+
+### From dose 1.0 to 2.0
+
+```{r, echo=FALSE}
+g2 <- select(filter(ToothGrowth, supp=="OJ", dose==2.0), len)
+g1 <- select(filter(ToothGrowth, supp=="OJ", dose==1.0), len)
+confGroth <- t.test(g2, g1, paired = FALSE)$conf.int
+```
+The range of values for the average growth with a confidence interval of 95% is between `r confGroth[1]` and `r confGroth[2]`.
+
+## Ascorbic Acid
+### From dose 0.5 to 1.0
+```{r, echo=FALSE}
+g2 <- select(filter(ToothGrowth, supp=="VC", dose==1.0), len)
+g1 <- select(filter(ToothGrowth, supp=="VC", dose==0.5), len)
+confGroth <- t.test(g2, g1, paired = FALSE)$conf.int
+```
+The range of values for the average growth with a confidence interval of 95% is between `r confGroth[1]` and `r confGroth[2]`.
+
+### From dose 1.0 to 2.0
+```{r, echo=FALSE}
+g2 <- select(filter(ToothGrowth, supp=="VC", dose==2.0), len)
+g1 <- select(filter(ToothGrowth, supp=="VC", dose==1.0), len)
+confGroth <- t.test(g2, g1, paired = FALSE)$conf.int
+```
+The range of values for the average growth with a confidence interval of 95% is between `r confGroth[1]` and `r confGroth[2]`.
+
+```{r, fig.width=7, fig.height=4, echo=FALSE}
+my_ci <- function(x) data.frame(y=mean(x), ymin=mean(x) - 2 * sd(x), ymax=mean(x) + 2 * sd(x))
+
+g <- ggplot(data=ToothGrowth, aes(x=dose, y=len))
+g <- g + geom_point(aes(color=supp), size=5, alpha=.5, position = position_jitter(w = 0.05, h = 0))
+g <- g + stat_summary(aes(color=supp), fun.data="my_ci", geom="smooth")
+g <- g + facet_wrap(~supp)
+g <- g + ggtitle("Figure 2 - Tooth groth comparison")
+g
+```
 
 # Conclusion
 
