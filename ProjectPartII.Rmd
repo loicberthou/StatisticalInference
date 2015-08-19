@@ -23,24 +23,19 @@ Then we will perform a comparison of the tooth groth by supp and dose as request
 
 # Exploratory data analysis
 
-The first thing to do with the dataset is to check if there is any sort of documentation attached to it. 
+The first thing to do with the dataset is to read the documentation attached to it (throught the _help_ function).
+The _str_ function also provides a useful overview of the dataset:
 
-```{r}
-help("ToothGrowth")
-```
-
-The _str_ function returns some useful information.
-
-```{r}
+```{r, echo=FALSE}
 str(ToothGrowth)
 ```
 
-Finally, I will draw a first plot of the scattered points.
+Finally, I will draw a first plot of the scattered points (Figure 1).
 
-```{r, fig.width=7, fig.height=4, echo=FALSE}
+```{r, fig.width=7, fig.height=3.5, echo=FALSE}
 g <- ggplot(data=ToothGrowth, aes(x=dose, y=len))
 g <- g + geom_point(aes(color=supp), size=5, alpha=.5)
-g <- g + ggtitle("Figure 1 - Exploratory data analysis")
+g <- g + ggtitle("figure 1 - Exploratory data analysis")
 g
 ```
 
@@ -56,6 +51,19 @@ We will compare the effects of the orange juice and ascorbic acid for each dose.
 
 We will then compare the mean length progression between two doses and look at the confidence interval to make any conclusion.
 
+To illustrate the analysis, we draw the scattered points with the average curve.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+my_ci <- function(x) data.frame(y=mean(x), ymin=mean(x) - sd(x), ymax=mean(x) + sd(x))
+
+g <- ggplot(data=ToothGrowth, aes(x=dose, y=len))
+g <- g + geom_point(aes(color=supp), size=5, alpha=.5, position = position_jitter(w = 0.05, h = 0))
+g <- g + geom_smooth(aes(color=supp))
+g <- g + facet_wrap(~supp)
+g <- g + ggtitle("figure 2 - Tooth groth comparison")
+g
+```
+
 ## Orange Juice
 
 ### From dose 0.5 to 1.0
@@ -63,47 +71,100 @@ We will then compare the mean length progression between two doses and look at t
 ```{r, echo=FALSE}
 g2 <- select(filter(ToothGrowth, supp=="OJ", dose==1.0), len)
 g1 <- select(filter(ToothGrowth, supp=="OJ", dose==0.5), len)
+meanGrothOJ0510 <- mean(g2$len - g1$len)
 confGroth <- t.test(g2, g1, paired = FALSE)$conf.int
 ```
-The range of values for the average growth with a confidence interval of 95% is between `r confGroth[1]` and `r confGroth[2]`.
+The average growth difference is `r meanGrothOJ0510` with a confidence interval of 95% between `r sprintf("%.2f", confGroth[1])` and `r sprintf("%.2f", confGroth[2])`.
 
 ### From dose 1.0 to 2.0
 
 ```{r, echo=FALSE}
 g2 <- select(filter(ToothGrowth, supp=="OJ", dose==2.0), len)
 g1 <- select(filter(ToothGrowth, supp=="OJ", dose==1.0), len)
+meanGrothOJ1020 <- mean(g2$len - g1$len)
 confGroth <- t.test(g2, g1, paired = FALSE)$conf.int
 ```
-The range of values for the average growth with a confidence interval of 95% is between `r confGroth[1]` and `r confGroth[2]`.
+The average growth difference is `r meanGrothOJ1020` with a confidence interval of 95% between `r sprintf("%.2f", confGroth[1])` and `r sprintf("%.2f", confGroth[2])`.
+
+We can say that there is a difference between the effects of the two doses but are not garanteed to be very big.
+
+### From dose 0.5 to 2.0
+
+```{r, echo=FALSE}
+g2 <- select(filter(ToothGrowth, supp=="OJ", dose==2.0), len)
+g1 <- select(filter(ToothGrowth, supp=="OJ", dose==0.5), len)
+meanGrothOJ0520 <- mean(g2$len - g1$len)
+confGroth <- t.test(g2, g1, paired = FALSE)$conf.int
+```
+The average growth difference is `r meanGrothOJ0520` with a confidence interval of 95% between `r sprintf("%.2f", confGroth[1])` and `r sprintf("%.2f", confGroth[2])`.
+
+The confidence interval with the confidence interval of the measurements "From dose 0.5 to 1.0" overlap. See the Conclusion.
 
 ## Ascorbic Acid
+
 ### From dose 0.5 to 1.0
+
 ```{r, echo=FALSE}
 g2 <- select(filter(ToothGrowth, supp=="VC", dose==1.0), len)
 g1 <- select(filter(ToothGrowth, supp=="VC", dose==0.5), len)
+meanGrothVC0510 <- mean(g2$len - g1$len)
 confGroth <- t.test(g2, g1, paired = FALSE)$conf.int
 ```
-The range of values for the average growth with a confidence interval of 95% is between `r confGroth[1]` and `r confGroth[2]`.
+The average growth difference is `r meanGrothVC0510` with a confidence interval of 95% between `r sprintf("%.2f", confGroth[1])` and `r sprintf("%.2f", confGroth[2])`.
 
 ### From dose 1.0 to 2.0
 ```{r, echo=FALSE}
 g2 <- select(filter(ToothGrowth, supp=="VC", dose==2.0), len)
 g1 <- select(filter(ToothGrowth, supp=="VC", dose==1.0), len)
+meanGrothVC1020 <- mean(g2$len - g1$len)
 confGroth <- t.test(g2, g1, paired = FALSE)$conf.int
 ```
-The range of values for the average growth with a confidence interval of 95% is between `r confGroth[1]` and `r confGroth[2]`.
+The average growth difference is `r meanGrothVC1020` with a confidence interval of 95% between `r sprintf("%.2f", confGroth[1])` and `r sprintf("%.2f", confGroth[2])`.
 
-```{r, fig.width=7, fig.height=4, echo=FALSE}
-my_ci <- function(x) data.frame(y=mean(x), ymin=mean(x) - 2 * sd(x), ymax=mean(x) + 2 * sd(x))
+### From dose 0.5 to 2.0
 
-g <- ggplot(data=ToothGrowth, aes(x=dose, y=len))
-g <- g + geom_point(aes(color=supp), size=5, alpha=.5, position = position_jitter(w = 0.05, h = 0))
-g <- g + stat_summary(aes(color=supp), fun.data="my_ci", geom="smooth")
-g <- g + facet_wrap(~supp)
-g <- g + ggtitle("Figure 2 - Tooth groth comparison")
-g
+```{r, echo=FALSE}
+g2 <- select(filter(ToothGrowth, supp=="VC", dose==2.0), len)
+g1 <- select(filter(ToothGrowth, supp=="VC", dose==0.5), len)
+meanGrothVC0520 <- mean(g2$len - g1$len)
+confGroth <- t.test(g2, g1, paired = FALSE)$conf.int
 ```
+The average growth difference is `r meanGrothVC0520` with a confidence interval of 95% between `r sprintf("%.2f", confGroth[1])` and `r sprintf("%.2f", confGroth[2])`.
 
 # Conclusion
 
-TODO
+The effect of ascorbic acid seems pretty consistant. The effect of the intermediate dose (1.0 mg), which has a difference in growth with the weakest dose (0.5 mg) of `r meanGrothOJ0510`. The strongest dose (2.0 mg) has an average difference in groth with the weakest dose (0.5 mg) of `r meanGrothVC0520`. By looking at the confidence intervals, we can say that the strongest dose has a very good chance of yielding better growth.
+
+On the other hand, the effect of orange juice is not as important with a stronger dose. The effect of the intermediate dose (1.0 mg), which has a difference in growth with the weakest dose (0.5 mg) of `r meanGrothOJ0510`. The strongest dose (2.0 mg) has an average difference in growth with the weakest dose (0.5 mg) of `r meanGrothOJ0520`. By looking at the confidence intervals, we can say that the stronger dose has an effect, but it is not garanteed to be much more effective than the intermediate dose.
+
+Something interesting to note is that, as the average differences in growth are not behaving similarly, we can see that the orange juice is more efficient at smaller doses than ascorbic acid. So despite a speeper curve for the ascorbic acid, the absolute effects on the guinea pigs are very similar at 2.0 mg. This is clearly visible in _figure 2_.
+
+$\pagebreak$
+
+# Appendix
+
+## Code for generating figure 1
+
+```{r, eval=FALSE}
+g <- ggplot(data=ToothGrowth, aes(x=dose, y=len))
+g <- g + geom_point(aes(color=supp), size=5, alpha=.5)
+g <- g + ggtitle("figure 1 - Exploratory data analysis")
+g
+```
+
+## Code for generating figure 2
+
+```{r, eval=FALSE}
+my_ci <- function(x) data.frame(y=mean(x), ymin=mean(x) - sd(x), ymax=mean(x) + sd(x))
+
+g <- ggplot(data=ToothGrowth, aes(x=dose, y=len))
+g <- g + geom_point(aes(color=supp), size=5, alpha=.5, position = position_jitter(w = 0.05, h = 0))
+g <- g + geom_smooth(aes(color=supp))
+g <- g + facet_wrap(~supp)
+g <- g + ggtitle("figure 2 - Tooth groth comparison")
+g
+```
+
+### Comments on figure 2
+
+The points have been jittered horizontally to be able to see their concentration more clearly.
