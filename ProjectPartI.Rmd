@@ -42,7 +42,7 @@ expMeans <- apply(expMatrix, 1, mean)
 
 We can visualize the distribution of these means on a histogram in *Figure 1*. The theoretical mean has been represented on this figure by the vertical red line.
 
-```{r, fig.width=7, fig.height=4, echo=FALSE}
+```{r, echo=FALSE}
 expMeansFrm <- data.frame(meanSim=expMeans)
 
 g <- ggplot(expMeansFrm, aes(x=meanSim))
@@ -98,6 +98,7 @@ g <- g + geom_vline(xintercept = 0, size = .5, color = "black")
 g <- g + geom_hline(yintercept = 0, size = .5, color = "black")
 g <- g + ggtitle("Figure 2 - Normalized sample mean distribution")
 g <- g + labs(x="normalized mean value")
+g <- g + xlim(-4, 4)
 g
 ```
 
@@ -165,5 +166,6 @@ g <- g + geom_vline(xintercept = 0, size = .5, color = "black")
 g <- g + geom_hline(yintercept = 0, size = .5, color = "black")
 g <- g + ggtitle("Figure 2 - Normalized sample mean distribution")
 g <- g + labs(x="normalized mean value")
+g <- g + xlim(-4, 4)
 g
 ```
